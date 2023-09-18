@@ -28,12 +28,12 @@ def main(args):
         return print("Export not found, place an 'Export_Fonts' in this dir")
     
     print("Loading Emojis")
-    emojimap = {}
-    emojimap = load_emoji() # Enables emoji replacement
+    emojimap, varsel = {}, {}
+    emojimap, varsel = load_emoji() # Enables emoji replacement
 
     # get glyphs from in font
     print("Loading font glyphs")
-    fontglyphs = get_font_glyphs(font, emojimap)
+    fontglyphs = get_font_glyphs(font, emojimap, varsel)
     print(get_glyphs_area(fontglyphs, 1))
     outdir = Path("Output_Fonts/")
     outdir.mkdir(exist_ok=True)
@@ -58,14 +58,21 @@ def load_emoji():
     with open("emoji.json", encoding="utf8") as f:
         emoji = json.load(f)
     emojimap = {} # char: char
+    varsel = {} # char: varselchar
     for em in emoji:
         if len(em["emoji"]) == 1:
             emojimap[em["emoji"]] = chr(emoji_replacement)
             emoji_replacement += 1
+        elif len(em["emoji"]) == 2:
+            # check for variation selector
+            if ord(em["emoji"][-1]) in range(65024, 65039+1):
+                emojimap[em["emoji"][0]] = chr(emoji_replacement)
+                varsel[em["emoji"][0]] = em["emoji"]
+                emoji_replacement += 1
     print(emojimap)
-    return emojimap
+    return emojimap, varsel
 
-def get_font_glyphs(font, emojimap):
+def get_font_glyphs(font, emojimap, varsel):
     glyphs = {}
     chars = []
     with ttLib.TTFont(font) as ttfontf:
@@ -84,9 +91,13 @@ def get_font_glyphs(font, emojimap):
             elif char in emojimap.values():
                 continue
 
+        drawchar = char
+        if char in varsel:
+            drawchar = varsel[char]
+
         im = Image.new("RGBA", (100, 100), (0,0,0,0))
         draw = ImageDraw.Draw(im)
-        draw.text((0, 30), char, (0,0,0,255), font=font, embedded_color=True)
+        draw.text((0, 30), drawchar, (0,0,0,255), font=font, embedded_color=True)
 
         imnp = numpy.array(im)
         imnp = numpy.where(imnp[:, :, 3] > 0) # Non transparent pixels
