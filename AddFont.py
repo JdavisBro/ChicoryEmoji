@@ -16,10 +16,10 @@ imagemagick = os.environ.get("IMAGEMAGICK")
 if imagemagick:
     imagemagick = Path(imagemagick) / "convert.exe"
 else:
-    shutil.which("magick") or shutil.which("convert")
+    imagemagick = shutil.which("magick") or shutil.which("convert")
 
 def main(args):
-    font = Path(" ".join(args))
+    font = Path(" ".join(args)) # todo: search C:\Windows\Fonts and other system font dirs.
     if not font.is_file():
         return print(f"Font {font} not found.")
 
