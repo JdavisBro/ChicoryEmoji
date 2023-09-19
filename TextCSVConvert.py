@@ -1,10 +1,12 @@
 import json
 from pathlib import Path
 
+from sharedfunc import load_emoji
+
 # Converts the second column of a CSV with emoji mapping
 
 def main():
-    emojimap = load_emoji()
+    emojimap = load_emoji()[0]
 
     text = ""
     with open("textin.csv", encoding="utf8") as f:
@@ -20,24 +22,6 @@ def main():
             line = f.readline()
     with open("text.csv", "w+", encoding="utf8") as f:
         f.write(text)
-
-def load_emoji():
-    emoji_replacement = 1120
-    with open("emoji.json", encoding="utf8") as f:
-        emoji = json.load(f)
-    emojimap = {} # char: char
-    varsel = {} # char: varselchar
-    for em in emoji:
-        if len(em["emoji"]) == 1:
-            emojimap[em["emoji"]] = chr(emoji_replacement)
-            emoji_replacement += 1
-        elif len(em["emoji"]) == 2:
-            # check for variation selector
-            if ord(em["emoji"][-1]) in range(65024, 65039+1):
-                emojimap[em["emoji"][0]] = chr(emoji_replacement)
-                emoji_replacement += 1
-    print(emojimap)
-    return emojimap
 
 if __name__ == "__main__":
     main()

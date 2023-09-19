@@ -12,6 +12,8 @@ import rectpack
 from fontTools import ttLib
 from PIL import Image, ImageDraw, ImageFont
 
+from sharedfunc import load_emoji
+
 imagemagick = os.environ.get("IMAGEMAGICK")
 if imagemagick:
     imagemagick = Path(imagemagick) / "convert.exe"
@@ -52,25 +54,6 @@ def main(args):
         with open(outdir / f"glyphs_{fontpath}.csv", "w+") as f:
             f.write(f"\"{fontinfo['displayName']}\";{fontinfo['emSize']};{fontinfo['bold']};{fontinfo['italic']};{fontinfo['charset']};{fontinfo['antiAliasing']};{fontinfo['scaleX']};{fontinfo['scaleY']}\n")
             make_glyphs_csv(f, glyphs)
-
-def load_emoji():
-    emoji_replacement = 1120
-    with open("emoji.json", encoding="utf8") as f:
-        emoji = json.load(f)
-    emojimap = {} # char: char
-    varsel = {} # char: varselchar
-    for em in emoji:
-        if len(em["emoji"]) == 1:
-            emojimap[em["emoji"]] = chr(emoji_replacement)
-            emoji_replacement += 1
-        elif len(em["emoji"]) == 2:
-            # check for variation selector
-            if ord(em["emoji"][-1]) in range(65024, 65039+1):
-                emojimap[em["emoji"][0]] = chr(emoji_replacement)
-                varsel[em["emoji"][0]] = em["emoji"]
-                emoji_replacement += 1
-    print(emojimap)
-    return emojimap, varsel
 
 def get_font_glyphs(font, emojimap, varsel):
     glyphs = {}
