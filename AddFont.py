@@ -91,6 +91,9 @@ def get_font_glyphs(font, emojimap, varsel):
         else:
             im = im.crop(crop)
 
+        # Path("imageout/").mkdir(exist_ok=True)
+        # im.save(f"imageout/{ord(char)}.png")
+
         if char in emojimap:
             char = emojimap[char]
 
@@ -102,6 +105,7 @@ def get_font_glyphs(font, emojimap, varsel):
         glyphs[char]["sourceHeight"] = im.height 
         glyphs[char]["shift"] = im.width
         glyphs[char]["offset"] = 2
+
     return glyphs
 
 def parse_fontinfo(fontinfotext):

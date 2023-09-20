@@ -1,6 +1,9 @@
-*.csv
-*.ttf
-Export_Fonts/
-Output_Fonts/
 __pycache__
 *.pyc
+
+*.csv
+*.ttf
+
+Export_Fonts/
+Output_Fonts/
+imageout/
