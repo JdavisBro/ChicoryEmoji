@@ -15,6 +15,8 @@ def main():
         line = f.readline()
         while line:
             for char in line:
+                if ord(char) in range(65024, 65039+1):
+                    continue # Variation Selector
                 if char in emojimap:
                     text += emojimap[char]
                 else:
